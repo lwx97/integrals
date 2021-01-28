@@ -2,7 +2,7 @@ package com.maowudi.integrals.bean;
 
 import lombok.Data;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 public class Role {
@@ -17,5 +17,6 @@ public class Role {
 
     private String available;
 
-    private Set<Permissions> permissions;
+    private List<Permissions> permissions;
+
 }

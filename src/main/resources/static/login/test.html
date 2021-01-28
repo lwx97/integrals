@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="../js/tool.js"></script>
+<script src="../js/jquery.min.js"></script>
+<body>
+账号：<input id="accountName" type="text"/><br/>
+账号：<input id="password" type="password"/><br/>
+<input type="button" value="登陆" onclick="userLogin();"/>
+</body>
+<script>
+
+    /**
+     * 登陆
+     */
+    function userLogin() {
+        var accountName = $("#accountName").val().trim();
+        var password = $("#password").val().trim();
+        console.log(getRootPath());
+        $.ajax({
+            url : getRootPath() + "userLogin",
+            type : 'post',
+            data : JSON.stringify({
+                "accountName" : accountName,
+                "password" : password
+            }),
+            dateType:'json',
+            contentType : 'application/json',
+            success : function (data) {
+                console.log(data);
+                if(data == 'success'){
+                    window.location.href = getRootPath()+"index.html";
+                }else{
+                    alert(data);
+                }
+            },
+            error : function () {
+
+            }
+        })
+    }
+</script>
+</html>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.maowudi.integrals.login.dao.LoginMapper">
+
+    <select id="getMapByAccountName" parameterType="java.lang.Integer" resultType="com.maowudi.integrals.bean.User">
+       select U.USER_ID as userId,U.USER_NAME as userName,U.JOB_NUMBER as jobNumber,U.ACCOUNT_NAME as accountName,U.PASSWORD,U.SALT,U.STATUS
+       from SYS_USER U where U.JOB_NUMBER = #{accountName}
+    </select>
+
+    <select id="getRoleByUserId" parameterType="java.lang.String" resultType="com.maowudi.integrals.bean.Role">
+        select sr.ROLE_ID,sr.ROLE_NAME as roleName,sr.ROLE_CODE as roleCode,sr.DESCRIPTION from SYS_USER_ROLE sur inner join SYS_ROLE sr
+        on sur.role_id = sur.user_id  = #{userId}
+    </select>
+
+    <select id="getPermissionByRoleId" parameterType="java.lang.Integer" resultType="com.maowudi.integrals.bean.Permissions">
+        select SP.name,SP.permission from sys_role_permission SRP
+            inner JOIN sys_permission SP ON SRP.permission_id = SP.id
+        where SRP.role_id = #{roleId}
+    </select>
+</mapper>

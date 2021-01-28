@@ -2,6 +2,7 @@ package com.maowudi.integrals.bean;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -13,11 +14,11 @@ public class User {
 
     private Integer jobNumber;
 
-    private Integer accountName;
+    private String accountName;
 
     private String salt;
 
     private String password;
 
-    private Set<Role> roles;
+    private List<Role> roles;
 }
