@@ -1,0 +1,9 @@
+server:
+  servlet:
+    context-path: /integrals
+spring:
+  datasource:
+    url: jdbc:mysql://39.105.134.3:3306/integrals
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
