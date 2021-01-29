@@ -7,3 +7,10 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+
+logging:
+  level:
+    com.maowudi: DEBUG
+    org.mybatis: DEBUG

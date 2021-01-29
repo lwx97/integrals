@@ -26,53 +26,23 @@ public class LoginServiceImpl implements LoginService{
         if(StringUtils.isEmpty(accountName)){
             return null;
         }
-        //查询基本信息
-        User user = loginMapper.getMapByAccountName(Integer.valueOf(accountName));
-        if(!Objects.isNull(user)){
-            //查询所属角色
-            List<Role> roleList = loginMapper.getRoleByUserId(user.getUserId());
-            //查询角色的所有权限
-            for(Role role : roleList){
-                List<Permissions> permissionsList = loginMapper.getPermissionByRoleId(role.getRoleId());
-                role.setPermissions(permissionsList);
+        try {
+            Integer acc = Integer.valueOf(accountName);
+            //查询基本信息
+            User user = loginMapper.getMapByAccountName(acc);
+            if(!Objects.isNull(user)){
+                //查询所属角色
+                List<Role> roleList = loginMapper.getRoleByUserId(user.getUserId());
+                //查询角色的所有权限
+                for(Role role : roleList){
+                    List<Permissions> permissionsList = loginMapper.getPermissionByRoleId(role.getRoleId());
+                    role.setPermissions(permissionsList);
+                }
+                user.setRoles(roleList);
             }
-            user.setRoles(roleList);
+            return user;
+        }catch (NumberFormatException e){
+            return null;
         }
-        return user;
-    }
-
-
-    public User getMapByAccountName1(String accountName) {
-        Permissions permissions = new Permissions();
-        permissions.setId(1);permissions.setPermission("add");
-        Permissions permissions2 = new Permissions();
-        permissions2.setId(2);permissions2.setPermission("query");
-        List<Permissions> permissionsSet = new ArrayList<>();
-        permissionsSet.add(permissions);
-        permissionsSet.add(permissions2);
-        Role role = new Role();
-        role.setRoleId(1);
-        role.setRoleName("admin");
-        role.setPermissions(permissionsSet);
-        List<Role> roleSet = new ArrayList<>();
-        roleSet.add(role);
-        User user = new User();
-        user.setUserId("1");user.setAccountName("151");user.setPassword("123456");
-        user.setRoles(roleSet);
-        Map<String, User> map = new HashMap<>();
-        map.put(user.getAccountName()+"", user);
-        List<Permissions> permissionsSet1 = new ArrayList<>();
-        permissionsSet1.add(permissions2);
-        Role role1 = new Role();
-        role1.setRoleId(2);
-        role1.setRoleName("user");
-        role1.setPermissions(permissionsSet1);
-        List<Role> roleSet1 = new ArrayList<>();
-        roleSet1.add(role1);
-        User user1 = new User();
-        user1.setUserId("2");user1.setAccountName("133");user1.setPassword("123456");
-        user1.setRoles(roleSet1);
-        map.put(user1.getAccountName()+"", user1);
-        return map.get(accountName);
     }
 }

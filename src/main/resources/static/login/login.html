@@ -88,9 +88,9 @@
 			//验证手机号
 			if($(this).is("#accountName")){
 				var mobileVal = $.trim(this.value);
-				// var regMobile = /^1[3|4|5|7|8][0-9]{9}$/;
-				if(mobileVal == ""){
-					var errorMsg = " 请输入员工号！";
+				var regMobile = /^[0-9]{3,11}$/;
+				if(mobileVal == "" || !regMobile.test(mobileVal)){
+					var errorMsg = " 请输入员工号或手机号！由3到11为纯数字组成！";
 					$parent.append("<span class='msg onError'>" + errorMsg + "</span>");
 				} else{
 					var okMsg=" 输入正确";
