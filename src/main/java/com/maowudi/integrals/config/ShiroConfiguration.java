@@ -53,7 +53,9 @@ public class ShiroConfiguration {
         map.put("/fonts/**","anon");
         map.put("/related/**","anon");
         map.put("/assets/**","anon");
-        map.put("/adminlte/**","anon");
+//        map.put("/adminlte/dist/**","anon");
+//        map.put("/adminlte/docs/**","anon");
+//        map.put("/adminlte/plugins/**","anon");
         //登出
         map.put("/logout", "logout");
         //对所有用户认证
