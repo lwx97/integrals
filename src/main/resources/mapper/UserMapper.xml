@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.maowudi.integrals.user.dao.UserMapper">
+
+    <cache type="org.mybatis.caches.redis.RedisCache">
+        <property name="timeout" value="1000*3600*1" />
+    </cache>
+
+    <resultMap id="resultUserMap" type="com.maowudi.integrals.bean.User">
+        <id column="USER_ID" property="userId"></id>
+        <result column="USER_NAME" property="userName"></result>
+        <result column="JOB_NUMBER" property="jobNumber"></result>
+        <result column="ACCOUNT_NAME" property="accountName"></result>
+        <result column="PASSWORD" property="password"></result>
+        <result column="salt" property="salt"></result>
+        <result column="STATUS" property="status"></result>
+        <result column="user_phone" property="userPhone"></result>
+        <result column="user_code" property="userCode"></result>
+        <result column="system_phone" property="systemPhone"></result>
+        <result column="shuangjishuangkao" property="shuangjishuangkao"></result>
+        <result column="point_address" property="pointAddress"></result>
+        <association property="warZone" javaType="com.maowudi.integrals.bean.WarZone">
+            <id column="WZ_ID" property="id"></id>
+            <result column="war_zone_name" property="warZoneAdminName"></result>
+        </association>
+        <association property="department" javaType="com.maowudi.integrals.bean.Department">
+            <id column="department_id" property="departmentId"></id>
+            <result column="department_name" property="departmentName"></result>
+            <result column="department_type" property="departmentType"></result>
+        </association>
+        <association property="armedServices" javaType="com.maowudi.integrals.bean.ArmedServices">
+            <id column="armed_services_id" property="armedServicesId"></id>
+            <id column="armed_services_name" property="armedServicesName"></id>
+        </association>
+        <association property="branchStore" javaType="com.maowudi.integrals.bean.BranchStore">
+            <id column="bs_id" property="bsId"></id>
+            <result column="bs_name" property="bsName"></result>
+            <result column="bs_type" property="bsType"></result>
+            <result column="bs_branch_type" property="bsBranchType"></result>
+        </association>
+    </resultMap>
+
+    <select id="getAllUser" parameterType="com.maowudi.integrals.bean.paramsvo.UserParamsVo" resultMap="resultUserMap">
+        select SU.USER_ID,SU.USER_NAME,SU.JOB_NUMBER,SU.ACCOUNT_NAME,SU.PASSWORD,SU.salt,SU.STATUS,
+        SU.user_phone,SU.user_code,SU.system_phone,SU.shuangjishuangkao,SU.point_address,
+        WZ.id as WZ_ID,WZ.war_zone_name,
+        D.department_id,D.department_name,D.department_type,
+        ASS.armed_services_id,ASS.armed_services_name,
+        BS.bs_id,BS.bs_name,BS.bs_type,BS.bs_branch_type
+        from SYS_USER SU LEFT JOIN WAR_ZONE WZ ON SU.war_zone_id = WZ.id
+        LEFT JOIN DEPARTMENT D ON SU.department_id = D.department_id
+        LEFT JOIN armed_services ASS ON SU.armed_services_id = ASS.armed_services_id
+        LEFT JOIN BRANCH_STORE BS ON SU.branch_store_id = BS.bs_id
+        <where>
+            <if test="userName != null and userName != ''">
+                and SU.USER_NAME like CONCAT('%',#{userName})
+            </if>
+        </where>
+        <if test="page != null">
+            limit #{page.start},#{page.limit}
+        </if>
+    </select>
+
+    <select id="getAllUserTotal" resultType="java.lang.Integer" parameterType="com.maowudi.integrals.bean.paramsvo.UserParamsVo">
+        select count(1)
+        from SYS_USER SU LEFT JOIN WAR_ZONE WZ ON SU.war_zone_id = WZ.id
+        LEFT JOIN DEPARTMENT D ON SU.department_id = D.department_id
+        LEFT JOIN armed_services ASS ON SU.armed_services_id = ASS.armed_services_id
+        LEFT JOIN BRANCH_STORE BS ON SU.branch_store_id = BS.bs_id
+        <where>
+            <if test="userName != null and userName != ''">
+                and SU.USER_NAME like CONCAT('%',#{userName})
+            </if>
+        </where>
+    </select>
+</mapper>

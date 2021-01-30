@@ -39,8 +39,11 @@
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <div class="col-md-1">
-                  <button type="button" class="btn btn-block btn-success">新增</button>
+                <div class="row">
+                  <div class="col-md-1">
+                     <button type="button" class="btn btn-block btn-success">新增</button>
+                    <button type="button" class="btn btn-block btn-success" onclick="selectUser();">查询</button>
+                  </div>
                 </div>
               </div>
               <!-- /.card-header -->
@@ -48,8 +51,8 @@
                 <table id="example2" class="table table-bordered table-hover">
                   <thead>
                   <tr>
-                    <td>全选:<input type="checkbox"/></td>
-                    <th hidden>userid</th>
+                    <th>全选:<input type="checkbox"/></th>
+                    <th>userid</th>
                     <th>用户工号</th>
                     <th>营销积分人员编码</th>
                     <th>用户名称</th>
@@ -64,51 +67,6 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td><input type="checkbox"/></td>
-                    <td hidden>userid</td>
-                    <td>1231</td>
-                    <td>Y1231</td>
-                    <td>测试1</td>
-                    <td>18893842410</td>
-                    <td>天安战区</td>
-                    <td>测试1营销中心</td>
-                    <td>军种1</td>
-                    <td>测试1支局</td>
-                    <td>13359564842</td>
-                    <td>教育</td>
-                    <td>xxx网点</td>
-                  </tr>
-                  <tr>
-                    <td><input type="checkbox"/></td>
-                    <td hidden>userid</td>
-                    <td>1231231</td>
-                    <td>Y1555531</td>
-                    <td>测试2</td>
-                    <td>18893842410</td>
-                    <td>天安战区</td>
-                    <td>测试2营销中心</td>
-                    <td>军种3</td>
-                    <td>测试2支局</td>
-                    <td>13359564842</td>
-                    <td></td>
-                    <td>xxx网点</td>
-                  </tr>
-                  <tr>
-                    <td><input type="checkbox"/></td>
-                    <td hidden>userid</td>
-                    <td>1231111</td>
-                    <td>Y1233331</td>
-                    <td>测试3</td>
-                    <td>18893842410</td>
-                    <td>天安战区</td>
-                    <td>测试1部</td>
-                    <td>军种4</td>
-                    <td>测试1门店</td>
-                    <td>13359564842</td>
-                    <td>教育</td>
-                    <td>xxx网点</td>
-                  </tr>
                   </tbody>
                 </table>
               </div>
@@ -142,6 +100,7 @@
 
 <!-- jQuery -->
 <script src="../../plugins/jquery/jquery.min.js"></script>
+<script src="../../../js/tool.js"></script>
 <!-- Bootstrap 4 -->
 <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables  & Plugins -->
@@ -163,16 +122,120 @@
 <script src="../../dist/js/demo.js"></script>
 </body>
 <script>
+
+  var tableApi = null;
   $(function () {
-    $('#example2').DataTable({
+    //提示信息
+    var lang = {
+      "sProcessing": "处理中...",
+      "sLengthMenu": "每页 _MENU_ 项",
+      "sZeroRecords": "没有匹配结果",
+      "sInfo": "当前显示第 _START_ 至 _END_ 项，共 _TOTAL_ 项。",
+      "sInfoEmpty": "当前显示第 0 至 0 项，共 0 项",
+      "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+      "sInfoPostFix": "",
+      "sSearch": "搜索:",
+      "sUrl": "",
+      "sEmptyTable": "表中数据为空",
+      "sLoadingRecords": "载入中...",
+      "sInfoThousands": ",",
+      "oPaginate": {
+        "sFirst": "首页",
+        "sPrevious": "上页",
+        "sNext": "下页",
+        "sLast": "末页",
+        "sJump": "跳转"
+      },
+      "oAria": {
+        "sSortAscending": ": 以升序排列此列",
+        "sSortDescending": ": 以降序排列此列"
+      }
+    };
+
+    tableApi = $('#example2').DataTable({
+      language:lang,  //提示信息
       "paging": true,
       "lengthChange": false,
       "searching": false,
-      "ordering": true,
+      "ordering": false,
       "info": true,
       "autoWidth": false,
       "responsive": true,
-    });
+      iDisplayLength : 10,
+      order: [],
+      serverSide : true,
+      ajax: function (data, callback, settings) {
+        //封装请求参数
+        console.log(data);
+        var param = getParam();
+        var page = {};
+        page.limit = data.length;//页面显示记录条数，在页面显示每页显示多少项的时候
+        page.start = data.start;//开始的记录序号
+        page.page = (data.start / data.length)+1;//当前页码
+        param.page = page;
+        // param.order = data.order[0]
+        //console.log(param);
+        //ajax请求数据
+        $.ajax({
+          type: "POST",
+          url: getRootPath() + "user/getAllUser",
+          cache: false,  //禁用缓存
+          data: JSON.stringify(param),  //传入组装的参数
+          dataType: "json",
+          contentType : 'application/json',
+          success: function (result) {
+            console.log(result);
+            if(result.success == 1){
+              var returnData = {};
+              returnData.draw = data.draw;//这里直接自行返回了draw计数器,应该由后台返回
+              returnData.recordsTotal = result.data.total;//返回数据全部记录
+              returnData.recordsFiltered = result.data.total;//后台不实现过滤功能，每次查询均视作全部结果
+              returnData.data = result.data.list;//返回的数据列表
+              //console.log(returnData);
+              //调用DataTables提供的callback方法，代表数据已封装完成并传回DataTables进行渲染
+              //此时的数据需确保正确无误，异常判断应在执行此回调前自行处理完毕
+              callback(returnData);
+            }
+          }
+        });
+      },
+      //列表表头字段
+      columns: [
+        { "defaultContent": "<input type='checkbox'/>" },
+        { "data": "userId","visible": false ,"sDefaultContent": ""},
+        { "data": "jobNumber","sDefaultContent": "" },
+        { "data": "userCode" ,"sDefaultContent": ""},
+        { "data": "userName" ,"sDefaultContent": ""},
+        { "data": "userPhone" ,"sDefaultContent": ""},
+        { "data": "warZone.warZoneAdminName" ,"sDefaultContent": ""},
+        { "data": "department.departmentName" ,"sDefaultContent": ""},
+        { "data": "armedServices.armedServicesName","sDefaultContent": "" },
+        { "data": "branchStore.bsName","sDefaultContent": "" },
+        { "data": "systemPhone","sDefaultContent": "" },
+        { "data": "shuangjishuangkao","sDefaultContent": ""},
+        { "data": "pointAddress","sDefaultContent": "" }
+      ]
+    });//此处需调用api()方法,否则返回的是JQuery对象而不是DataTables的API对象
+
   });
+
+  /**
+   *
+   //先拿到点击的行号
+   var rowIndex = $(this).parents("tr").index();
+   //此处拿到隐藏列的id
+   var id = $('#example').DataTable().row(rowIndex).data().id;
+   */
+  var p = {};
+  function getParam(){
+    return p;
+  }
+
+
+
+  function selectUser() {
+    p.userName = '李文祥';
+    tableApi.ajax.reload();
+  }
 </script>
 </html>

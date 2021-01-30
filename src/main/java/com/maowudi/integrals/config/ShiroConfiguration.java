@@ -56,10 +56,13 @@ public class ShiroConfiguration {
 //        map.put("/adminlte/dist/**","anon");
 //        map.put("/adminlte/docs/**","anon");
 //        map.put("/adminlte/plugins/**","anon");
+        //开发阶段，全部放开
+        map.put("/**", "anon");
         //登出
         map.put("/logout", "logout");
         //对所有用户认证
-        map.put("/**", "authc");
+//        map.put("/**", "authc");
+
         //登录
         shiroFilterFactoryBean.setLoginUrl("/login");
         //首页
